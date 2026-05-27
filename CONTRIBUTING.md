@@ -2,24 +2,24 @@
 
 > Author: Your Name (Claude)
 
-Hướng dẫn cho các bots/contributors thêm docs vào KB (`kb.superunderwear.org`).
+Guide for bots and contributors to add documentation to KB (`kb.superunderwear.org`).
 
 ---
 
-## 1. Cấu trúc một project
+## 1. Project Structure
 
-Mỗi project cần 1 file `kb-manifest.yml` đặt ở **root của thư mục docs**:
+Each project needs a `kb-manifest.yml` file at the **root of its docs directory**:
 
 ```yaml
-project: ten-project          # slug, dùng làm URL path
-title: Tên Hiển Thị
-description: "Mô tả ngắn"
+project: my-project            # slug, used as URL path
+title: My Project
+description: "Short description"
 icon: "🔥"
 color:
   light: "#f59e0b"
   dark: "#fbbf24"
 
-# Optional: exclude dirs không cần sync lên KB
+# Optional: exclude dirs from KB sync
 exclude:
   - node_modules
   - .github
@@ -35,39 +35,39 @@ sidebar:
   - text: Section Name
     items:
       - text: Page Title
-        link: /ten-project/page-name
+        link: /my-project/page-name
 ```
 
-CI tự scan tất cả `kb-manifest.yml` trong mỗi repo → tạo project trên KB.
+CI auto-scans all `kb-manifest.yml` files in each repo and creates projects on KB.
 
 ---
 
-## 2. Thêm project mới
+## 2. Adding a New Project
 
-### Repo đã có trong `repos.yml`:
-1. Tạo thư mục docs + các file `.md`
-2. Thêm `kb-manifest.yml` vào root thư mục docs
-3. Push → CI tự sync + build + deploy
+### Repo already listed in `repos.yml`:
+1. Create a docs directory with `.md` files
+2. Add `kb-manifest.yml` to the docs root
+3. Push — CI auto-syncs, builds, and deploys
 
-### Repo mới chưa có:
-1. Thêm tên repo vào `repos.yml` trong `Tiny-Hive/knowledge-base`
-2. Tạo docs + `kb-manifest.yml` như trên
-3. Push cả 2 repos
+### New repo not yet listed:
+1. Add the repo name to `repos.yml` in `Tiny-Hive/knowledge-base`
+2. Create docs + `kb-manifest.yml` as above
+3. Push both repos
 
 ---
 
-## 3. Viết Markdown
+## 3. Writing Markdown
 
-VitePress render Markdown thành HTML. Một số lưu ý:
+VitePress renders Markdown to HTML. Key conventions:
 
-### Tiêu đề
+### Headings
 ```markdown
-# H1 — dùng cho title (1 lần duy nhất)
-## H2 — sections chính
+# H1 — page title (use once)
+## H2 — main sections
 ### H3 — sub-sections
 ```
 
-### Code blocks
+### Code Blocks
 ````markdown
 ```yaml
 key: value
@@ -82,41 +82,41 @@ const x: number = 42
 ```
 ````
 
-### Hình ảnh
+### Images
 ```markdown
 ![Alt text](./path/to/image.png)
 ```
 
-Hình ảnh trên KB hỗ trợ **click để zoom** (PhotoSwipe) — không cần config gì thêm.
+Images on KB support **click-to-zoom** (PhotoSwipe) — no extra config needed.
 
 ---
 
 ## 4. Excalidraw Diagrams
 
-KB hỗ trợ embed file `.excalidraw` trực tiếp. CI tự convert sang PNG khi build.
+KB supports embedding `.excalidraw` files directly. CI auto-converts them to PNG at build time.
 
-### Cách dùng:
+### Usage:
 
-1. **Tạo diagram** bằng [excalidraw.com](https://excalidraw.com) hoặc VS Code extension
-2. **Save file** `.excalidraw` vào thư mục docs (ví dụ `diagrams/my-diagram.excalidraw`)
-3. **Embed trong Markdown** — dùng đuôi `.excalidraw`, KHÔNG phải `.png`:
+1. **Create a diagram** using [excalidraw.com](https://excalidraw.com) or the VS Code extension
+2. **Save the file** as `.excalidraw` in your docs directory (e.g. `diagrams/my-diagram.excalidraw`)
+3. **Embed in Markdown** — use the `.excalidraw` extension, NOT `.png`:
 
 ```markdown
 ![Architecture Diagram](./diagrams/my-diagram.excalidraw)
 ```
 
-4. **Push** → CI tự động:
-   - Convert `.excalidraw` → `.png` (cùng path, cùng tên)
-   - Rewrite markdown refs từ `.excalidraw)` → `.png)`
-   - Build + deploy
+4. **Push** — CI automatically:
+   - Converts `.excalidraw` → `.png` (same path, same name)
+   - Rewrites markdown refs from `.excalidraw)` → `.png)`
+   - Builds and deploys
 
-### Lưu ý:
-- **KHÔNG cần commit file `.png`** — CI tạo tự động
-- **KHÔNG sửa ref thành `.png`** trong markdown — để `.excalidraw`, CI rewrite
-- Nếu cần update diagram: sửa file `.excalidraw`, push lại, CI re-convert
-- File `.excalidraw` là JSON text — git diff friendly, mergeable
+### Important:
+- **Do NOT commit `.png` files** — CI generates them automatically
+- **Do NOT change refs to `.png`** in markdown — keep `.excalidraw`, CI rewrites
+- To update a diagram: edit the `.excalidraw` file, push, CI re-converts
+- `.excalidraw` files are JSON text — git diff friendly, mergeable
 
-### Ví dụ cấu trúc:
+### Example structure:
 ```
 my-project/
 ├── kb-manifest.yml
@@ -129,9 +129,9 @@ my-project/
 
 ---
 
-## 5. Exclude directories
+## 5. Excluding Directories
 
-Nếu project có thư mục không muốn sync lên KB (build artifacts, test data, etc.), thêm `exclude` trong `kb-manifest.yml`:
+If your project has directories that shouldn't be synced to KB (build artifacts, test data, etc.), add `exclude` to `kb-manifest.yml`:
 
 ```yaml
 exclude:
@@ -141,25 +141,25 @@ exclude:
   - __pycache__
 ```
 
-CI dùng `rsync --exclude` nên pattern match tên thư mục.
+CI uses `rsync --exclude`, so patterns match directory names.
 
 ---
 
 ## 6. Access Control
 
 ### Policy types:
-- `public` — ai cũng xem được
-- `restricted` — chỉ users trong `allowed_emails` hoặc `allowed_groups`
+- `public` — visible to everyone
+- `restricted` — only users in `allowed_emails` or `allowed_groups`
 
 ### Groups:
-Groups được define trong `groups.yml` ở repo `knowledge-base`:
+Groups are defined in `groups.yml` in the `knowledge-base` repo:
 ```yaml
 core-team:
   - user1@gmail.com
   - user2@gmail.com
 ```
 
-Dùng group trong manifest:
+Reference groups in your manifest:
 ```yaml
 access:
   policy: restricted
@@ -167,9 +167,9 @@ access:
     - core-team
 ```
 
-### Thêm user mới:
-- Thêm email vào `allowed_emails` trong `kb-manifest.yml` của project
-- Hoặc thêm vào group trong `groups.yml`
+### Adding a new user:
+- Add their email to `allowed_emails` in your project's `kb-manifest.yml`
+- Or add them to a group in `groups.yml`
 
 ---
 
@@ -183,21 +183,21 @@ Push to source repo
     → Deploy: docker build + push GHCR, rollout restart K8s
 ```
 
-### Trigger thủ công:
+### Manual trigger:
 ```bash
 gh workflow run "Pull docs from source repos" \
   -R Tiny-Hive/knowledge-base \
-  -f repo=all        # hoặc tên repo cụ thể
+  -f repo=all        # or a specific repo name
 ```
 
 ---
 
 ## 8. Troubleshooting
 
-| Vấn đề | Nguyên nhân | Fix |
-|---------|-------------|-----|
-| Build fail "Could not resolve" | Markdown ref file không tồn tại | Check path, đảm bảo file có trong repo và không bị exclude |
-| Excalidraw không convert | File `.excalidraw` bị exclude | Bỏ thư mục chứa nó khỏi `exclude` list |
-| Docs không update | CI chưa trigger | Chạy dispatch thủ công hoặc check `repos.yml` |
-| 403 trên KB | Email chưa có trong access list | Thêm vào `allowed_emails` hoặc group |
-| Ảnh bị stretch khi zoom | Browser cache | Hard refresh (Ctrl+Shift+R) |
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| Build fail "Could not resolve" | Markdown refs a file that doesn't exist | Check path, ensure file exists and isn't excluded |
+| Excalidraw not converting | `.excalidraw` file is in an excluded dir | Remove its directory from the `exclude` list |
+| Docs not updating | CI hasn't triggered | Run manual dispatch or check `repos.yml` |
+| 403 on KB | Email not in access list | Add to `allowed_emails` or a group |
+| Image stretched on zoom | Browser cache | Hard refresh (Ctrl+Shift+R) |
